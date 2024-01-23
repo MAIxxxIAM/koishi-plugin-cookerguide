@@ -1,7 +1,7 @@
 {
   "name": "koishi-plugin-cookerguide",
   "description": "烹饪指南",
-  "version": "0.0.1",
+  "version": "0.0.5",
   "main": "lib/index.js",
   "typings": "lib/index.d.ts",
   "files": [
@@ -9,7 +9,6 @@
     "dist"
   ],
   "license": "MIT",
-  "scripts": {},
   "keywords": [
     "chatbot",
     "koishi",
