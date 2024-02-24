@@ -1,4 +1,16 @@
-const t = [{
+
+
+export interface Recipe {
+    name: string;
+    stuff: string[];
+    bv: string;
+    difficulty: string;
+    tags: string[];
+    methods: string[];
+    tools: string[];
+}
+
+const t:Array<Recipe> = [{
     name: "电饭煲版广式腊肠煲饭",
     stuff: ["腊肠", "米"],
     bv: "BV1NE411Q7Jj",

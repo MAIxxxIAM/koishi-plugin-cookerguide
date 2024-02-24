@@ -1,21 +1,15 @@
-import { App, Bot, Context, Schema, Session } from 'koishi'
-import t from './recipe/recipe'
-import { resolve } from 'path'
+import {Context, Schema, Session } from 'koishi'
+import t,{Recipe} from './recipe/recipe'
 export const name = 'cookerguide'
 
 export const usage =`
 markdown模板：
-
-        #{{.tittle}}
-        !{{.imgsize}}({{.img_url}})
         > {{.text1}}
         > {{.text2}}
         > {{.text3}}
         > {{.text4}}
         > {{.text5}}
         > {{.text6}}
-
-        {{.text7}}
 
 本插件仅限QQ官方bot使用，且需要开启markdown权限
 `
@@ -36,23 +30,29 @@ export interface Config {
 
 export const Config: Schema<Config> = Schema.object({
   mdid: Schema.string().required(),
-  key1: Schema.string().default('tittle'),
-  key2: Schema.string().default('imgsize'),
-  key3: Schema.string().default('img_url'),
-  key4: Schema.string().default('text1'),
-  key5: Schema.string().default('text2'),
-  key6: Schema.string().default('text3'),
-  key7: Schema.string().default('text4'),
-  key8: Schema.string().default('text5'),
-  key9: Schema.string().default('text6'),
-  key10: Schema.string().default('text7'),
+  key1: Schema.string().default('text1'),
+  key2: Schema.string().default('text2'),
+  key3: Schema.string().default('text3'),
+  key4: Schema.string().default('text4'),
+  key5: Schema.string().default('text5'),
+  key6: Schema.string().default('text6'),
+  key7: Schema.string().default('text7'),
+  key8: Schema.string().default('text8'),
+  key9: Schema.string().default('text9'),
+  key10: Schema.string().default('text10'),
 
 })
 let ingredients: object = {}
 export function apply(ctx: Context, config: Config) {
   ctx.on('interaction/button', async (session) => {
-    const { d } = session.event._data
-    console.log(d.id)
+    const { d } = session.event._data;
+    try {
+      await session.bot.internal.acknowledgeInteraction(session.event._data.d.id, {
+          code: 0
+      });
+  }
+  catch (e) {
+  }
     // await session.bot.internal.acknowledgeInteraction(d.id,"1")
     const Adata = d.data.resolved.button_data
     const data = Adata.split(' ')[2]
@@ -60,7 +60,6 @@ export function apply(ctx: Context, config: Config) {
     switch (btnType) {
       case '肉类':{
         const msg_id = Adata.split(' ')[1]
-        const { url } = await session.app['server.temp'].create(`file://${resolve(`${__dirname}/img/1.jpg`)}`)
         const md: object = {
           content: "111",
           msg_type: 2,
@@ -70,14 +69,6 @@ export function apply(ctx: Context, config: Config) {
               {
                 key: config.key1,
                 values: [`选择肉类 <@${session.event.user.id}>`]
-              },
-              {
-                key: config.key2,
-                values: ["[img#512px #512px]"]
-              },
-              {
-                key: config.key3,
-                values: [url]
               },
               {
                 key: config.key4,
@@ -138,7 +129,7 @@ export function apply(ctx: Context, config: Config) {
           },
           msg_id: msg_id,
           timestamp: session.timestamp,
-          msg_seq: 3
+          msg_seq: Math.floor(Math.random() * 1000)
         }
         await session.bot.internal.sendMessage(session.channelId, md)
         break;
@@ -155,11 +146,10 @@ export function apply(ctx: Context, config: Config) {
         const msg_id = Adata.split(' ')[1]
         let matchedRecipes = t.filter(recipe => countMatches(recipe, session,data) > 0)
         matchedRecipes.sort((recipe1, recipe2) => countMatches(recipe2, session,data) - countMatches(recipe1, session,data))
-        const { url } = await session.app['server.temp'].create(`file://${resolve(`${__dirname}/img/1.jpg`)}`)
         let btnLise: { buttons: any[] }[] = []
         for (let i in matchedRecipes) {
           const url = "https://www.bilibili.com/video/" + matchedRecipes[i]?.bv
-          btnLise.push({ "buttons": [urlbtn(session.event.user.id,i.toString(), matchedRecipes[i]?.name, url)] })
+          btnLise.push({ "buttons": [urlbtn(i.toString(), matchedRecipes[i]?.name, url)] })
           if (btnLise.length > 4) break
         }
         const cooklist=matchedRecipes?.slice(0, 5)?.map(recipe => recipe.name)?.join('\r')
@@ -173,14 +163,6 @@ export function apply(ctx: Context, config: Config) {
               {
                 key: config.key1,
                 values: ["快点击按钮开始你的烹饪之旅"]
-              },
-              {
-                key:config.key2,
-                values: ["[img#256px #256px]"]
-              },
-              {
-                key:config.key3,
-                values: [url]
               },
               {
                 key:config.key4,
@@ -220,7 +202,7 @@ export function apply(ctx: Context, config: Config) {
           },
           msg_id: msg_id,
           timestamp: session.timestamp,
-          msg_seq: 2
+          msg_seq: Math.floor(Math.random() * 1000)
         }
         await session.bot.internal.sendMessage(session.channelId, md)
         delete ingredients[session.event.user.id]
@@ -232,7 +214,6 @@ export function apply(ctx: Context, config: Config) {
       const { platform } = session
       if (platform == 'qqguild') return `该功能目前只在QQ群官方机器人开放，敬请期待后续更新`
       if (platform !== 'qq') return `该功能目前只在QQ群官方机器人开放，敬请期待后续更新`
-      const { url } = await session.app['server.temp'].create(`file://${resolve(`${__dirname}/img/1.jpg`)}`)
       const md: object = {
         content: "111",
         msg_type: 2,
@@ -242,14 +223,6 @@ export function apply(ctx: Context, config: Config) {
             {
               key: config.key1,
               values: [`选择原料  <@${session.userId}>`]
-            },
-            {
-              key: config.key2,
-              values: ["[img#512px #512px]"]
-            },
-            {
-              key: config.key3,
-              values: [url]
             },
             {
               key: config.key4,
@@ -302,11 +275,11 @@ export function apply(ctx: Context, config: Config) {
         },
         msg_id: session.messageId,
         timestamp: session.timestamp,
-        msg_seq: 1
+        msg_seq: Math.floor(Math.random() * 1000)
       }
       await session.bot.internal.sendMessage(session.channelId, md)
     })
-  function btn(u,a: string, b: string, c: string, msgid: string, type: string) {
+  function btn(u:string,a: string, b: string, c: string, msgid: string, type: string) {
     return {
       "id": a,
       "render_data": {
@@ -324,7 +297,7 @@ export function apply(ctx: Context, config: Config) {
       },
     }
   }
-  function urlbtn(u,a: string, b: string, c: string) {
+  function urlbtn(a: string, b: string, c: string) {
     return {
       "id": a,
       "render_data": {
@@ -341,8 +314,8 @@ export function apply(ctx: Context, config: Config) {
       },
     }
   }
-  function countMatches(recipe, session: Session,tools) {
-    return ingredients[session.event.user.id]['material']?.reduce((count, ingredient) => count + ((recipe.stuff.includes(ingredient)&&recipe.tools.includes(tools)) ? 1 : 0), 0)
+  function countMatches(recipe: Recipe, session: Session,tools:string) {
+    return ingredients[session.event.user.id]?.['material']?.reduce((count:number, ingredient: string) => count + ((recipe.stuff.includes(ingredient)&&recipe.tools.includes(tools)) ? 1 : 0), 0)
   }
 }
 
