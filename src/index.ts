@@ -4,12 +4,12 @@ export const name = 'cookerguide'
 
 export const usage =`
 markdown模板：
-        > {{.text1}}
-        > {{.text2}}
-        > {{.text3}}
-        > {{.text4}}
-        > {{.text5}}
-        > {{.text6}}
+{{.text1}}
+{{.text2}}
+{{.text3}}
+{{.text4}}
+{{.text5}}
+{{.text6}}
 
 本插件仅限QQ官方bot使用，且需要开启markdown权限
 `
@@ -284,7 +284,7 @@ export function apply(ctx: Context, config: Config) {
       "id": a,
       "render_data": {
         "label": b,
-        "visited_label": b
+        "visited_label": `✅${b}`
       },
       "action": {
         "type": 1,

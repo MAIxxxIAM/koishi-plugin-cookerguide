@@ -1,7 +1,7 @@
 {
   "name": "koishi-plugin-cookerguide",
   "description": "烹饪指南",
-  "version": "0.0.8",
+  "version": "0.0.13",
   "main": "lib/index.js",
   "typings": "lib/index.d.ts",
   "files": [
