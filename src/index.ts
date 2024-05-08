@@ -45,7 +45,7 @@ export const Config: Schema<Config> = Schema.object({
 let ingredients: object = {}
 export function apply(ctx: Context, config: Config) {
   ctx.on('interaction/button', async (session) => {
-    const { d } = session.event._data;
+    const { d,id } = session.event._data;
     try {
       await session.bot.internal.acknowledgeInteraction(session.event._data.d.id, {
           code: 0
@@ -55,11 +55,11 @@ export function apply(ctx: Context, config: Config) {
   }
     // await session.bot.internal.acknowledgeInteraction(d.id,"1")
     const Adata = d.data.resolved.button_data
-    const data = Adata.split(' ')[2]
+    const data = Adata.split(' ')[1]
     const btnType = Adata.split(' ')[0]
     switch (btnType) {
       case '肉类':{
-        const msg_id = Adata.split(' ')[1]
+        const vage=ingredients[session.event.user.id]?.['material']?ingredients[session.event.user.id]['material'].join('||'):'不吃蔬菜不是好孩子哦~'
         const md: object = {
           content: "111",
           msg_type: 2,
@@ -80,7 +80,7 @@ export function apply(ctx: Context, config: Config) {
               },
               {
                 key: config.key6,
-                values: [ingredients[session.event.user.id]['material'].join('||')]
+                values: [vage]
               }
             ]
           },
@@ -90,44 +90,44 @@ export function apply(ctx: Context, config: Config) {
               rows: [
                 {
                   "buttons": [
-                    btn(session.event.user.id,'1', '🥓午餐肉', '午餐肉', msg_id, '原料'),
-                    btn(session.event.user.id,'2', '🌭香肠', '香肠', msg_id, '原料'),
-                    btn(session.event.user.id,'3', '🌭  腊肠', '花菜', msg_id, '原料'),
+                    btn(session.event.user.id,'🥓午餐肉', '🥓午餐肉', '午餐肉', '原料'),
+                    btn(session.event.user.id,'🌭香肠', '🌭香肠', '香肠', '原料'),
+                    btn(session.event.user.id,'🌭  腊肠', '🌭腊肠', '腊肠', '原料'),
                   ]
                 },
                 {
                   "buttons": [
-                    btn(session.event.user.id,'4', '🐤鸡肉', '鸡肉', msg_id, '原料'),
-                    btn(session.event.user.id,'5', '🐷猪肉', '猪肉', msg_id, '原料'),
-                    btn(session.event.user.id,'6', '🥚鸡蛋', '鸡蛋', msg_id, '原料'),
+                    btn(session.event.user.id,'🐤鸡肉', '🐤鸡肉', '鸡肉', '原料'),
+                    btn(session.event.user.id,'🐷猪肉', '🐷猪肉', '猪肉', '原料'),
+                    btn(session.event.user.id,'🥚鸡蛋', '🥚鸡蛋', '鸡蛋', '原料'),
                   ]
                 },
                 {
                   "buttons": [
-                    btn(session.event.user.id,'7', '🦐虾', '虾', msg_id, '原料'),
-                    btn(session.event.user.id,'8', '🐮牛肉', '牛肉', msg_id, '原料'),
-                    btn(session.event.user.id,'9', '🦴骨头', '骨头', msg_id, '原料'),
-                    btn(session.event.user.id,'10', '🐟鱼', '鱼', msg_id, '原料'),
+                    btn(session.event.user.id,'🦐虾', '🦐虾', '虾', '原料'),
+                    btn(session.event.user.id,'🐮牛肉', '🐮牛肉', '牛肉', '原料'),
+                    btn(session.event.user.id,'🦴骨头', '🦴骨头', '骨头', '原料'),
+                    btn(session.event.user.id,'🐟鱼', '🐟鱼', '鱼', '原料'),
                   ]
                 },
                 {
                   "buttons": [
-                    btn(session.event.user.id,'16', '⬇️点击下方厨具开始烹饪', '111', msg_id, '111'),
+                    btn(session.event.user.id,'烹饪', '⬇️点击下方厨具开始烹饪', '111', '111'),
                   ]
                 },
                 {
                   "buttons": [
-                    btn(session.event.user.id,'11', '烤箱', '烤箱', msg_id, '制作'),
-                    btn(session.event.user.id,'12', '炸锅', '空气炸锅', msg_id, '制作'),
-                    btn(session.event.user.id,'13', '微波', '微波炉', msg_id, '制作'),
-                    btn(session.event.user.id,'14', '电饭煲', '电饭煲', msg_id, '制作'),
-                    btn(session.event.user.id,'15', '大锅', '一口大锅', msg_id, '制作'),
+                    btn(session.event.user.id,'烤箱', '烤箱', '烤箱', '制作'),
+                    btn(session.event.user.id,'炸锅', '炸锅', '空气炸锅', '制作'),
+                    btn(session.event.user.id,'微波', '微波', '微波炉', '制作'),
+                    btn(session.event.user.id,'电饭煲', '电饭煲', '电饭煲', '制作'),
+                    btn(session.event.user.id,'大锅', '大锅', '一口大锅', '制作'),
                   ]
                 },
               ]
             }
           },
-          msg_id: msg_id,
+          event_id: id,
           timestamp: session.timestamp,
           msg_seq: Math.floor(Math.random() * 1000)
         }
@@ -143,7 +143,6 @@ export function apply(ctx: Context, config: Config) {
         }
         break;
       case '制作':
-        const msg_id = Adata.split(' ')[1]
         let matchedRecipes = t.filter(recipe => countMatches(recipe, session,data) > 0)
         matchedRecipes.sort((recipe1, recipe2) => countMatches(recipe2, session,data) - countMatches(recipe1, session,data))
         let btnLise: { buttons: any[] }[] = []
@@ -153,7 +152,50 @@ export function apply(ctx: Context, config: Config) {
           if (btnLise.length > 4) break
         }
         const cooklist=matchedRecipes?.slice(0, 5)?.map(recipe => recipe.name)?.join('\r')
-        console.log(cooklist)
+        if(!ingredients[session.event.user.id]?.['material']){
+          const md = {
+            content: "111",
+          msg_type: 2,
+          markdown: {
+            custom_template_id: config.mdid,
+            params: [
+              {
+                key: config.key1,
+                values: ["请重新开始选菜"]
+              },
+            ]
+          },
+
+          keyboard: {
+            content: {
+              rows:[{buttons:[
+                {
+                  "id": '菜单',
+                  "render_data": {
+                    "label":'菜单',
+                    "visited_label": `'菜单'`
+                  },
+                  "action": {
+                    "type":2,
+                    "permission": {
+                      "type": 2,
+                      "specify_user_ids":[session.event.user.id]
+                    },
+                    "unsupport_tips": "兼容文本",
+                    "data": '菜单',
+                    enter:true
+                  },
+                }
+              ]}] 
+            }
+          },
+          event_id:id,
+          timestamp: session.timestamp,
+          msg_seq: Math.floor(Math.random() * 1000)
+          }
+          await session.bot.internal.sendMessage(session.channelId, md)
+          return
+        }
         const md: object = {
           content: "111",
           msg_type: 2,
@@ -200,7 +242,7 @@ export function apply(ctx: Context, config: Config) {
               rows: btnLise
             }
           },
-          msg_id: msg_id,
+          event_id:id,
           timestamp: session.timestamp,
           msg_seq: Math.floor(Math.random() * 1000)
         }
@@ -236,38 +278,38 @@ export function apply(ctx: Context, config: Config) {
             rows: [
               {
                 "buttons": [
-                  btn(session.userId,'1', '🥔土豆', '土豆', session.messageId, '原料'),
-                  btn(session.userId,'2', '🥕胡萝卜', '胡萝卜', session.messageId, '原料'),
-                  btn(session.userId,'3', '🥦花菜', '花菜', session.messageId, '原料'),
+                  btn(session.userId,'🥔土豆', '🥔土豆', '土豆',  '原料'),
+                  btn(session.userId,'🥕胡萝卜', '🥕胡萝卜', '胡萝卜',  '原料'),
+                  btn(session.userId,'🥦花菜', '🥦花菜', '花菜',  '原料'),
                 ]
               },
               {
                 "buttons": [
-                  btn(session.userId,'4', '🥣白萝卜', '白萝卜', session.messageId, '原料'),
-                  btn(session.userId,'5', '🥒西葫芦', '西葫芦', session.messageId, '原料'),
-                  btn(session.userId,'6', '🍅番茄', '番茄', session.messageId, '原料'),
+                  btn(session.userId,'🥣白萝卜', '🥣白萝卜', '白萝卜',  '原料'),
+                  btn(session.userId,'🥒西葫芦', '🥒西葫芦', '西葫芦',  '原料'),
+                  btn(session.userId,'🍅番茄', '🍅番茄', '番茄',  '原料'),
                 ]
               },
               {
                 "buttons": [
-                  btn(session.userId,'7', '🥬芹菜', '芹菜', session.messageId, '原料'),
-                  btn(session.userId,'8', '🥒黄瓜', '黄瓜', session.messageId, '原料'),
-                  btn(session.userId,'9', '🧅洋葱', '洋葱', session.messageId, '原料'),
+                  btn(session.userId,'🥬芹菜', '🥬芹菜', '芹菜',  '原料'),
+                  btn(session.userId,'🥒黄瓜', '🥒黄瓜', '黄瓜',  '原料'),
+                  btn(session.userId,'🧅洋葱', '🧅洋葱', '洋葱',  '原料'),
                 ]
               },
               {
                 "buttons": [
-                  btn(session.userId,'10', '🎍莴笋', '莴笋', session.messageId, '原料'),
-                  btn(session.userId,'11', '🍄菌菇', '菌菇', session.messageId, '原料'),
-                  btn(session.userId,'12', '🍆茄子', '茄子', session.messageId, '原料'),
+                  btn(session.userId,'🎍莴笋', '🎍莴笋', '莴笋',  '原料'),
+                  btn(session.userId,'🍄菌菇', '🍄菌菇', '菌菇',  '原料'),
+                  btn(session.userId,'🍆茄子', '🍆茄子', '茄子',  '原料'),
                 ]
               },
               {
                 "buttons": [
-                  btn(session.userId,'13', '🍲豆腐', '豆腐', session.messageId, '原料'),
-                  btn(session.userId,'14', '🥗包菜', '包菜', session.messageId, '原料'),
-                  btn(session.userId,'15', '🥬白菜', '白菜', session.messageId, '原料'),
-                  btn(session.userId,'16', '确认', '确认', session.messageId, '肉类')
+                  btn(session.userId,'🍲豆腐', '🍲豆腐', '豆腐',  '原料'),
+                  btn(session.userId,'🥗包菜', '🥗包菜', '包菜',  '原料'),
+                  btn(session.userId,'🥬白菜', '🥬白菜', '白菜',  '原料'),
+                  btn(session.userId,'确认', '确认', '确认',  '肉类')
                 ]
               },
             ]
@@ -279,7 +321,7 @@ export function apply(ctx: Context, config: Config) {
       }
       await session.bot.internal.sendMessage(session.channelId, md)
     })
-  function btn(u:string,a: string, b: string, c: string, msgid: string, type: string) {
+  function btn(u:string,a: string, b: string, c: string, type: string) {
     return {
       "id": a,
       "render_data": {
@@ -293,7 +335,7 @@ export function apply(ctx: Context, config: Config) {
           "specify_user_ids":[u]
         },
         "unsupport_tips": "兼容文本",
-        "data": `${type} ${msgid} ${c}`
+        "data": `${type} ${c}`
       },
     }
   }
